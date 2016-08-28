@@ -96,6 +96,55 @@ module.exports.setup = function setup() {
                 }
                 return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
                     s4() + '-' + s4() + s4() + s4();
+            },
+            /**
+             * Write to the console of what you will earn for remote mining.
+             *  ticks = Duration to calulate.
+             *  distance = How far is the source.
+             *  energyCap = How much your haulers can carry.
+             * @param ticks
+             * @param distance
+             * @param energyCap
+             */
+            cost(ticks, distance, energyCap) {
+                let minerBody = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE];
+                let minerAmount = (ticks / (1500 - distance));
+                let minerCost = this.getBodyCost(minerBody);
+                let energyMined = ticks * 10;
+                let haulerSize = energyCap / 2;
+                let haulerTrips = Math.floor(1500 / (distance * 2));
+                let haulerAmount = energyMined / haulerSize / haulerTrips;
+                let claimerAmount = ticks / (500 - distance);
+                let creepDamage = ((minerBody.length * minerAmount) + (2 * claimerAmount) + ((haulerTrips * 2) * (haulerAmount) * (haulerSize / 25)));
+                let roadDamage = ((creepDamage + ticks) * 0.001) * distance;
+                let minerPrice = (minerCost * minerAmount);
+                let haulerPrice = ((haulerSize * 2) * haulerAmount);
+                let containerPrice = ticks * 0.5;
+                let claimerPrice = (claimerAmount * 650);
+                let losses = roadDamage + haulerPrice + claimerPrice + roadDamage + containerPrice;
+                console.log("Results for " + ticks + " ticks at a distance of " + distance);
+                console.log("You need " + minerAmount + " miners to mine " + energyMined + " energy.");
+                console.log("With a energy capacity of " + energyCap + ", you can build haulers holding " + haulerSize + " energy. They can make " + haulerTrips + " trips, so you require " + haulerAmount + " haulers");
+                console.log("You will need " + claimerAmount + " claimers");
+                console.log("Because of all this traffic, your roads will lose " + creepDamage + " ticks per segment");
+                console.log("Cost of miners: " + minerPrice);
+                console.log("Cost of haulers: " + haulerPrice);
+                console.log("Cost of claimers: " + claimerPrice);
+                console.log("Cost of road repairs: " + roadDamage);
+                console.log("cost of Container: " + containerPrice);
+                console.log("You will make " + (energyMined - losses) + " energy")
+            },
+            /**
+             *
+             * @param body (BodyPart)
+             * @returns {number}
+             */
+            getBodyCost (body) {
+                let cost = 0;
+                for (let part of body) {
+                    cost += BODYPART_COST[part]
+                }
+                return cost
             }
         }
     );
