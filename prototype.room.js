@@ -1,4 +1,4 @@
-let statsConsole = require("statsConsole");
+//let statsConsole = require("statsConsole");
 
 
 let regexLeft = /[EW][0-9]{1,2}/;
@@ -84,8 +84,8 @@ module.exports = function () {
                         this.removeFromBuildQueue();
                     }
                     else {
-                        //console.log("Failed to build creep: " + creep.name);
-                        statsConsole.log("Failed to build creep: " + creep.name, 4);
+                        console.log("Failed to build creep: " + creep.name);
+                        //statsConsole.log("Failed to build creep: " + creep.name, 4);
                     }
                 }
             } else {
