@@ -47,21 +47,21 @@ module.exports.setup = function setup() {
             },
             getRolesInBuildQueue(role)
             {
-                return _.filter(Memory.GlobalQueue, {
-                    filter: function (creep) {
+                return _.filter(Memory.GlobalQueue,
+                    function (creep) {
                         return creep.memory.role = role;
                     }
-                });
+                );
             },
             distributeQueue()
             {
                 let creeps = Memory.GlobalQueue;
                 
-                let myRooms = _.filter(Game.rooms, {
-                    filter: function (room) {
+                let myRooms = _.filter(Game.rooms,
+                    function (room) {
                         return room.getQueue().length < 10;
                     }
-                });
+                );
                 for (let room in myRooms) {
                     room.addToBuildQueue(creeps[0].name, creeps[0].body, creeps[0].memory);
                     removeFromBuildQueue()
@@ -98,10 +98,7 @@ module.exports.setup = function setup() {
                     s4() + '-' + s4() + s4() + s4();
             },
             /**
-             * Write to the console of what you will earn for remote mining.
-             *  ticks = Duration to calulate.
-             *  distance = How far is the source.
-             *  energyCap = How much your haulers can carry.
+             *
              * @param ticks
              * @param distance
              * @param energyCap
@@ -147,5 +144,6 @@ module.exports.setup = function setup() {
                 return cost
             }
         }
-    );
+    )
+    ;
 };
