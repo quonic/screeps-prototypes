@@ -1,3 +1,6 @@
+//Module to Export
+
+
 module.exports = function () {
     /**
      * Get nearby assault creep, change as needed
@@ -253,24 +256,26 @@ module.exports = function () {
     Creep.prototype.collectEnergyFromDump =
         function () {
             
-            var nearestContainer = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            let nearestContainer = this.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: function (structure) {
                     if (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 100) {
                         return true;
                     }
                 }
             });
-            
-            var nearestLink = this.pos.findClosestByRange(FIND_STRUCTURES, {
+    
+            let nearestLink = this.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: function (structure) {
-                    if ((structure.structureType == STRUCTURE_LINK) && (structure.energy > 190)) {
+                    if ((structure.structureType == STRUCTURE_LINK) && (structure.energy >= 200)) {
                         return true;
                     }
                 }
             });
+            
             if (nearestContainer && nearestLink && this.pos.getRangeTo(nearestContainer) < this.pos.getRangeTo(nearestLink) && !Memory.workingLinks[nearestLink.id]) {
                 
                 let message = nearestContainer.transfer(this, RESOURCE_ENERGY);
+                //console.log(message + ":" + this.name);
                 if (message == ERR_NOT_IN_RANGE) {
                     this.moveTo(nearestContainer);
                 }
@@ -288,7 +293,8 @@ module.exports = function () {
             }
             
             if (nearestLink) {
-                var transferMessage = nearestLink.transferEnergy(this);
+                let transferMessage = nearestLink.transferEnergy(this);
+                //console.log(transferMessage + ":" + this.name);
                 if (transferMessage == ERR_NOT_IN_RANGE) {
                     this.moveTo(nearestLink);
                 }
@@ -321,6 +327,7 @@ module.exports = function () {
     
             if(_.sum(this.room.storage.store) < this.room.storage.storeCapacity) {
                 let transferMessage = this.room.depositResource(this, RESOURCE_ENERGY);
+                //console.log(transferMessage + ": " + this.name);
                 if (transferMessage == ERR_NOT_IN_RANGE) {
                     this.moveTo(this.room.storage);
                 }
@@ -348,18 +355,18 @@ module.exports = function () {
      */
     Creep.prototype.findMyNearByCreeps =
         function () {
-            return _.filter(this.pos.findInRange(this.pos, 1, FIND_MY_CREEPS), {
-                filter: function (c) {
+            return _.filter(this.pos.findInRange(this.pos, 1, FIND_MY_CREEPS),
+                function (c) {
                     return c.id != this.id;
                 }
-            });
+            );
         };
     /**
      * Move around another creep if we haven't moved.
      * Todo: get this working.
-     * 
+     *
      * Work in progress. Untested!!!
-     * 
+     *
      * @param pos
      * @returns {*}
      */
@@ -371,11 +378,11 @@ module.exports = function () {
             } else {
                 if (this.didWeMove()) {
                     let nextPos = this.getNextPathPos();
-                    let creepNotMoved = _.filter(this.findMyNearByCreeps(), {
-                        filter: function (c) {
+                    let creepNotMoved = _.filter(this.findMyNearByCreeps(),
+                        function (c) {
                             return c.pos == nextPos;
                         }
-                    });
+                    );
                     creepNotMoved.moveTo(this.pos);
                     statusMoved = this.moveTo(creepNotMoved);
                 }
