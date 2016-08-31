@@ -141,15 +141,14 @@ module.exports = function () {
      * @param role
      */
     Room.prototype.getLivingRoles = function (role) {
-        let roleFilter = {
-            filter: function (creep) {
+        let roleFilter =
+            function (creep) {
                 return creep.memory.role == role;
-            }
-        };
+            };
         if (this._livingRoles) {
             return _.filter(this._livingRoles, roleFilter);
         }
-        this._livingRolse = this.find(FIND_MY_CREEPS);
+        this._livingRoles = this.find(FIND_MY_CREEPS);
         return _.filter(this._livingRoles, roleFilter);
     };
     /**
