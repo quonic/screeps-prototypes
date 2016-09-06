@@ -145,10 +145,13 @@ module.exports = function () {
             function (creep) {
                 return creep.memory.role == role;
             };
+            
         if (this._livingRoles) {
             return _.filter(this._livingRoles, roleFilter);
         }
+        
         this._livingRoles = this.find(FIND_MY_CREEPS);
+        
         return _.filter(this._livingRoles, roleFilter);
     };
     /**
@@ -230,7 +233,7 @@ module.exports = function () {
             if (this._mineral) {
                 return this._mineral;
             }
-            this._mineral = this.find(FIND_MINERALS);
+            this._mineral = this.find(FIND_MINERALS)[0];
             return this._mineral;
         };
     /**
