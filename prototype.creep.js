@@ -125,6 +125,7 @@ module.exports = function () {
             
             if (_.sum(this.carry) == 0) {
                 //console.log("Not carrying anything");
+                this.memory.refillingTerminal = false;
                 return false;
             }
             if (!this.memory.refillingTerminal) {
@@ -156,24 +157,18 @@ module.exports = function () {
         function () {
             let mineral = this.room.getMineral();
             
-            if (this.carry[mineral.mineralType] != 0) {
-                //console.log("Not carrying " + mineral.mineralType);
-                return false;
-            }
-            if (this.room.storage.store[mineral.mineralType] > 0) {
-                //console.log("Let get to filling the terminal");
-                this.memory.refillingTerminal = true;
-            }
-            
-            if (this.room.storage) {
-                let getMsg = this.withdraw(this.room.storage, mineral.mineralType);
-                //console.log("Filling the terminal! " + getMsg);
-                if (getMsg != OK) {
+            if(this.carry[mineral.mineralType] == 0 && this.room.storage.store[mineral.mineralType] > 0){
+                if(!this.pos.inRangeTo(this.room.storage.pos, 1)){
                     this.moveTo(this.room.storage);
+                    this.memory.refillingTerminal = true;
+                    return true;
+                }else{
+                    this.room.withdrawResource(this, mineral.mineralType);
+                    this.memory.refillingTerminal = true;
+                    return true;
                 }
-                return true;
             }
-            this.memory.refillingTerminal = false;
+            //this.memory.refillingTerminal = false;
             return false;
             
         };
@@ -208,7 +203,7 @@ module.exports = function () {
                 }
                 else {
                     let tMessage = homeLink.transferEnergy(this);
-                    if (tMessage == OK){
+                    if (tMessage == OK) {
                         let dropOffEnergy = _.sum(this.carry);
                         this.room.saveUsedEnergy(dropOffEnergy);
                         
@@ -263,10 +258,10 @@ module.exports = function () {
                     }
                 }
             });
-    
-            let nearestLink = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            
+            let nearestLink = this.room.storage.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: function (structure) {
-                    if ((structure.structureType == STRUCTURE_LINK) && (structure.energy >= 200)) {
+                    if ((structure.structureType == STRUCTURE_LINK) /*&& (structure.energy >= 0)*/) {
                         return true;
                     }
                 }
@@ -292,7 +287,7 @@ module.exports = function () {
                 return false;
             }
             
-            if (nearestLink) {
+            if (nearestLink && nearestLink.energy > 0) {
                 let transferMessage = nearestLink.transferEnergy(this);
                 //console.log(transferMessage + ":" + this.name);
                 if (transferMessage == ERR_NOT_IN_RANGE) {
@@ -324,8 +319,8 @@ module.exports = function () {
             if (!this.memory.refillingStorage) {
                 return false;
             }
-    
-            if(_.sum(this.room.storage.store) < this.room.storage.storeCapacity) {
+            
+            if (_.sum(this.room.storage.store) < this.room.storage.storeCapacity) {
                 let transferMessage = this.room.depositResource(this, RESOURCE_ENERGY);
                 //console.log(transferMessage + ": " + this.name);
                 if (transferMessage == ERR_NOT_IN_RANGE) {
