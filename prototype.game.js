@@ -6,19 +6,9 @@ module.exports.setup = function setup() {
             friendlyFilter() {
                 return {
                     filter: function (c) {
-                        if (c.owner.username === "Nam") {
+                        if (c.owner.username === "Friend1") {
                             return false;
-                        } else if (c.owner.username === "Zim") {
-                            return false;
-                        } else if (c.owner.username === "GMan") {
-                            return false;
-                        } else if (c.owner.username === "Dushinto") {
-                            return false;
-                        } else if (c.owner.username === "Icon") {
-                            return false;
-                        } else if (c.owner.username === "Artritus") {
-                            return false;
-                        } else if (c.owner.username === "EmptySet") {
+                        } else if (c.owner.username === "Friend2") {
                             return false;
                         }
                         return true;
