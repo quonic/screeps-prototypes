@@ -31,7 +31,7 @@ module.exports = function () {
     Creep.prototype.getNearByEnemyCreep =
         function (range) {
             let distance = range || null;
-            if (distance != null) {
+            if (distance !== null) {
                 return this.pos.findInRange(FIND_HOSTILE_CREEPS, range, Game.friendlyFilter());
             }
             return this.pos.findClosestByRange(FIND_HOSTILE_CREEPS, Game.friendlyFilter());
@@ -59,7 +59,7 @@ module.exports = function () {
                     this.attack(myTarget);
                 }
             }
-            
+
         };
     /**
      * Attack nearby enemy creep, or specific target.
@@ -93,7 +93,7 @@ module.exports = function () {
             } else {
                 this.attack(myTarget);
             }
-            
+
         };
     /**
      * Move creep to flag specified. Change as needed.
@@ -103,6 +103,12 @@ module.exports = function () {
     Creep.prototype.moveToFlaggedRoom =
         function (flag) {
             if (flag && flag.pos) {
+                /*let creeps = _.filter(flag.room.lookForAt(LOOK_CREEPS,flag.pos), function(c){return !c.my});
+                 let struct = _.filter(flag.room.lookForAt(LOOK_STRUCTURES,flag.pos), function(c){return !c.my});
+
+                 if(creeps.length > 1){
+                 return false;
+                 }*/
                 if (flag.pos.roomName != this.pos.roomName) {
                     this.moveTo(flag.pos, {ignoreCreeps: true, ignoreRoads: true}); //, {ignoreCreeps: true}
                     return true;
@@ -122,8 +128,8 @@ module.exports = function () {
     Creep.prototype.dumpAtTerminal =
         function () {
             let mineral = this.room.getMineral();
-            
-            if (_.sum(this.carry) == 0) {
+
+            if (_.sum(this.carry) === 0) {
                 //console.log("Not carrying anything");
                 this.memory.refillingTerminal = false;
                 return false;
@@ -132,17 +138,17 @@ module.exports = function () {
                 //console.log("Not filling Terminal");
                 return false;
             }
-            
+
             if (this.room.terminal && this.room.terminal.store[mineral.mineralType] > 0) {
                 if (this.room.terminal.transfer(this, mineral.mineralType) != OK) {
                     this.moveTo(this.room.terminal);
                 }
                 return true;
-                
+
             }
-            
+
             var storage = this.room.getStorage();
-            
+
             var transferMessage = this.transfer(storage, mineral.mineralType);
             if (transferMessage == ERR_NOT_IN_RANGE) {
                 this.moveTo(storage);
@@ -156,8 +162,8 @@ module.exports = function () {
     Creep.prototype.collectMineralFromStorage =
         function () {
             let mineral = this.room.getMineral();
-            
-            if(this.carry[mineral.mineralType] == 0 && this.room.storage.store[mineral.mineralType] > 0){
+
+            if(this.carry[mineral.mineralType] === 0 && this.room.storage.store[mineral.mineralType] > 0){
                 if(!this.pos.inRangeTo(this.room.storage.pos, 1)){
                     this.moveTo(this.room.storage);
                     this.memory.refillingTerminal = true;
@@ -170,7 +176,6 @@ module.exports = function () {
             }
             //this.memory.refillingTerminal = false;
             return false;
-            
         };
     /**
      * Get this creeps home.
@@ -189,7 +194,7 @@ module.exports = function () {
     Creep.prototype.collectEnergyFromStorage =
         function (ignoreRoomStorage) {
             var home = this.getHome();
-            if (this.carry.energy != 0) {
+            if (this.carry.energy !== 0) {
                 return false;
             }
             var homeLink = home.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -206,13 +211,11 @@ module.exports = function () {
                     if (tMessage == OK) {
                         let dropOffEnergy = _.sum(this.carry);
                         this.room.saveUsedEnergy(dropOffEnergy);
-                        
                     }
-                    
                 }
                 return true;
             }
-            
+
             var nearestContainer = this.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: function (structure) {
                     if (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 0) {
@@ -220,22 +223,22 @@ module.exports = function () {
                     }
                 }
             });
-            
-            if (nearestContainer != null) {
+
+            if (nearestContainer !== null) {
                 if (nearestContainer.transfer(this, RESOURCE_ENERGY) != OK) {
                     this.moveTo(nearestContainer);
                 }
                 return true;
             }
-            
+
             /*        if (this.room.terminal && this.room.terminal.store[RESOURCE_ENERGY] > 0) {
              if (this.room.terminal.transfer(this, RESOURCE_ENERGY) != OK) {
              this.moveTo(this.room.terminal);
              }
              return true;
-             
+
              }*/
-            
+
             if (!ignoreRoomStorage && this.room.storage) {
                 let withdrawMessage = this.room.withdrawResource(this, RESOURCE_ENERGY);
                 if (withdrawMessage != OK) {
@@ -250,7 +253,7 @@ module.exports = function () {
      */
     Creep.prototype.collectEnergyFromDump =
         function () {
-            
+
             let nearestContainer = this.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: function (structure) {
                     if (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 100) {
@@ -258,7 +261,7 @@ module.exports = function () {
                     }
                 }
             });
-            
+
             let nearestLink = this.room.storage.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: function (structure) {
                     if ((structure.structureType == STRUCTURE_LINK) /*&& (structure.energy >= 0)*/) {
@@ -266,27 +269,27 @@ module.exports = function () {
                     }
                 }
             });
-            
+
             if (nearestContainer && nearestLink && this.pos.getRangeTo(nearestContainer) < this.pos.getRangeTo(nearestLink) && !Memory.workingLinks[nearestLink.id]) {
-                
+
                 let message = nearestContainer.transfer(this, RESOURCE_ENERGY);
                 //console.log(message + ":" + this.name);
                 if (message == ERR_NOT_IN_RANGE) {
                     this.moveTo(nearestContainer);
                 }
-                
+
                 this.memory.refillingStorage = true;
                 return true;
             }
-            
+
             if (nearestLink || nearestContainer) {
                 this.memory.refillingStorage = true;
             }
-            
-            if (this.carry.energy != 0) {
+
+            if (this.carry.energy !== 0) {
                 return false;
             }
-            
+
             if (nearestLink && nearestLink.energy > 0) {
                 let transferMessage = nearestLink.transferEnergy(this);
                 //console.log(transferMessage + ":" + this.name);
@@ -303,7 +306,7 @@ module.exports = function () {
                 return true;
             }
             this.memory.refillingStorage = false;
-            
+
             return false;
         };
     /**
@@ -313,13 +316,13 @@ module.exports = function () {
      */
     Creep.prototype.dumpEnergyAtStorage =
         function () {
-            if (this.carry.energy == 0) {
+            if (this.carry.energy === 0) {
                 return false;
             }
             if (!this.memory.refillingStorage) {
                 return false;
             }
-            
+
             if (_.sum(this.room.storage.store) < this.room.storage.storeCapacity) {
                 let transferMessage = this.room.depositResource(this, RESOURCE_ENERGY);
                 //console.log(transferMessage + ": " + this.name);

@@ -16,18 +16,19 @@ var offsets = [
 ];
 
 module.exports = function () {
+
     /**
      * Initialize the build queue
      */
     Room.prototype.initBuildQueue =
         function () {
-            if (Memory.rooms == undefined) {
+            if (Memory.rooms === undefined) {
                 Memory.rooms = {};
             }
-            if (Memory.rooms[this.name] == undefined) {
+            if (Memory.rooms[this.name] === undefined) {
                 Memory.rooms[this.name] = {};
             }
-            if (this.controller.my && Memory.rooms[this.name].buildQueue == undefined) {
+            if (this.controller.my && Memory.rooms[this.name].buildQueue === undefined) {
                 this.clearBuildQueue();
             }
         };
@@ -64,7 +65,7 @@ module.exports = function () {
         function (role) {
             return _.filter(Memory.rooms[this.name].buildQueue,
                 function (creep) {
-                    return creep.memory.role = role;
+                    return creep.memory.role == role;
                 }
             );
         };
@@ -77,15 +78,17 @@ module.exports = function () {
         function (spawn) {
             let spawns = this.getIdleSpawn();
             if (spawns) {
-                for (let spawn in spawns) {
+                for (let myspawn in spawns) {
+                    if (!spawns.hasOwnProperty(myspawn)) {
+                        continue;
+                    }
                     let creep = this.getQueue();
-                    let created = spawn.createCustomCreep(creep[0].name, creep[0].body, creep[0].memory);
-                    if (created == true) {
+                    let created = myspawn.createCustomCreep(creep[0].name, creep[0].body, creep[0].memory);
+                    if (created === true) {
                         this.removeFromBuildQueue();
                     }
                     else {
-                        console.log("Failed to build creep: " + creep.name);
-                        //statsConsole.log("Failed to build creep: " + creep.name, 4);
+                        myspawn.log("Failed to build creep: " + creep.name, ERR);
                     }
                 }
             } else {
@@ -113,6 +116,9 @@ module.exports = function () {
             let energySum = 0;
             let myStructures = this.find(FIND_STRUCTURES);
             for (var structureName in myStructures) {
+                if (!myStructures.hasOwnProperty(structureName)) {
+                    continue;
+                }
                 var structure = myStructures[structureName];
                 if (structure.energy > 0) {
                     energySum += structure.energy;
@@ -145,13 +151,13 @@ module.exports = function () {
             function (creep) {
                 return creep.memory.role == role;
             };
-            
+
         if (this._livingRoles) {
             return _.filter(this._livingRoles, roleFilter);
         }
-        
+
         this._livingRoles = this.find(FIND_MY_CREEPS);
-        
+
         return _.filter(this._livingRoles, roleFilter);
     };
     /**
@@ -161,9 +167,12 @@ module.exports = function () {
      */
     Room.prototype.getHarvestPoints =
         function (sources) {
-            if (this.memory.harvestPoints == undefined) {
+            if (this.memory.harvestPoints === undefined) {
                 let harvestPoints = 0;
                 for (var sourceKey in sources) {
+                    if (!sources.hasOwnProperty(sourceKey)) {
+                        continue;
+                    }
                     var source = sources[sourceKey];
                     var initial = source.pos;
                     for (var offsetKey in offsets) {
@@ -311,7 +320,7 @@ module.exports = function () {
         function () {
             return this.find(FIND_MY_SPAWNS, {
                 filter: function (spawn) {
-                    return spawn.spawning == null;
+                    return spawn.spawning === null;
                 }
             })
         };
@@ -389,5 +398,25 @@ module.exports = function () {
                 this.saveUsedEnergy(creep.carry[resource]);
             }
             return message;
+        };
+    /**
+     * Garbage Collect - set used variables to undefined
+     */
+    Room.prototype.gc =
+        function () {
+            this._storedEnergyInRoom = undefined;
+            this._sources = undefined;
+            this._livingRoles = undefined;
+            this._extensions = undefined;
+            this._hostiles = undefined;
+            this._hostile_structures = undefined;
+            this._mineral = undefined;
+            this._labs = undefined;
+            this._usedEnergy = undefined;
+            this._towers = undefined;
+            this._storage = undefined;
+            this._storedEnergyInRoom = undefined;
+            this._harvestedEnergy = undefined;
+            this.lastInit = Game.time;
         };
 };

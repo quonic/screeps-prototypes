@@ -2,7 +2,7 @@ var game = require('prototype.game'); // This is about the only way I could get 
 require('prototype.room')();
 require('prototype.spawn')();
 require('prototype.creep')();
-
+require('utils.logger'); // From: https://github.com/Puciek/screeps-elk/blob/master/js/utils.logger.js
 
 module.exports.loop = function () {
 
@@ -33,5 +33,6 @@ module.exports.loop = function () {
             }
 
         }
+        room.gc();
     }
-}
+};

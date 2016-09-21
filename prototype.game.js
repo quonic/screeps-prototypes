@@ -8,9 +8,17 @@ module.exports.setup = function setup() {
                     filter: function (c) {
                         if (c.owner.username === "Nam") {
                             return false;
-                        } else if (c.owner.username === "Friend1") {
+                        } else if (c.owner.username === "Zim") {
                             return false;
-                        } else if (c.owner.username === "Friend2") {
+                        } else if (c.owner.username === "GMan") {
+                            return false;
+                        } else if (c.owner.username === "Dushinto") {
+                            return false;
+                        } else if (c.owner.username === "Icon") {
+                            return false;
+                        } else if (c.owner.username === "Artritus") {
+                            return false;
+                        } else if (c.owner.username === "EmptySet") {
                             return false;
                         }
                         return true;
@@ -29,7 +37,7 @@ module.exports.setup = function setup() {
             },
             initBuildQueue()
             {
-                if (Memory.GlobalQueue == undefined) {
+                if (Memory.GlobalQueue === undefined) {
                     Memory.GlobalQueue = {};
                 }
             },
@@ -49,20 +57,23 @@ module.exports.setup = function setup() {
             {
                 return _.filter(Memory.GlobalQueue,
                     function (creep) {
-                        return creep.memory.role = role;
+                        return creep.memory.role == role;
                     }
                 );
             },
             distributeQueue()
             {
                 let creeps = Memory.GlobalQueue;
-                
+
                 let myRooms = _.filter(Game.rooms,
                     function (room) {
                         return room.getQueue().length < 10;
                     }
                 );
                 for (let room in myRooms) {
+                    if (!myRooms.hasOwnProperty(room)) {
+                        continue;
+                    }
                     room.addToBuildQueue(creeps[0].name, creeps[0].body, creeps[0].memory);
                     removeFromBuildQueue()
                 }
@@ -90,7 +101,7 @@ module.exports.setup = function setup() {
                         .toString(16)
                         .substring(1);
                 }
-                
+
                 if (small) {
                     return s4() + s4();
                 }
