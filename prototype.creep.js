@@ -20,8 +20,11 @@ module.exports = function () {
      */
     Creep.prototype.getNearByCreep =
         function () {
-            // TODO make this either exclude the 'this' creep or do something else.
-            return this.pos.findClosestByRange(FIND_MY_CREEPS);
+            return this.pos.findClosestByRange(FIND_MY_CREEPS, {
+                function(creep){
+                    return creep.id !== this.id;
+                }
+            });
         };
     /**
      * Get nearby enemy creep, or specify a range and return more than one.
