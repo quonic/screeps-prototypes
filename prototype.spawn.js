@@ -93,21 +93,4 @@ module.exports = function () {
             }
 
         };
-    /**
-     *
-     * @returns {boolean}
-     */
-    StructureSpawn.prototype.buildCreepFromQueue =
-        function () {
-            let creep = Memory.rooms[this.room.name].buildQueue[0];
-            let created = this.createCustomCreep(creep.name, creep.body, creep.memory);
-            if (created === true) {
-                this.room.removeFromBuildQueue();
-                return true;
-            }
-            else {
-                this.log("Failed to build creep: " + creep.name, ERR);
-            }
-            return false;
-        };
 };
