@@ -1,14 +1,33 @@
 var game = require('prototype.game'); // This is about the only way I could get this to work.
 require('prototype.room')();
-require('prototype.spawn')();
+require('queue')();
 require('prototype.creep')();
-require('utils.logger'); // From: https://github.com/Puciek/screeps-elk/blob/master/js/utils.logger.js
+
+global.EMERG = 0;
+global.ALERT = 1;
+global.CRIT = 2;
+global.ERR = 3;
+global.WARNING = 4;
+global.NOTICE = 5;
+global.INFO = 6;
+global.DEBUG = 7;
+// Check if we failed to load utils.logger and don't try to run more than once
+if(FailedUtilsLogger) {
+    try {
+        require('utils.logger'); // From: https://github.com/Puciek/screeps-elk/blob/master/js/utils.logger.js
+        global.useUtilsLogger = true;
+        global.FailedUtilsLogger = false;
+    } catch (err) {
+        global.useUtilsLogger = false;
+        global.FailedUtilsLogger = true;
+        console.log("utils.logger.js: Not found.", ERR);
+    }
+}
 
 module.exports.loop = function () {
 
     game.setup();
 
-    //getHarvestedEnergy and getUsedEnergy example usage.
     let rooms = Game.rooms;
     for (let roomKey in rooms) {
         if (!rooms.hasOwnProperty(roomKey)) {
@@ -17,6 +36,7 @@ module.exports.loop = function () {
         let room = Game.rooms[roomKey];
         var isMyRoom = (room.controller ? room.controller.my : 0);
         if (isMyRoom) {
+            //getHarvestedEnergy and getUsedEnergy example usage.
             let deposit = room.getHarvestedEnergy();
             if (deposit) {
                 Memory.stats['room.' + room.name + '.homeHarvestedEnergy'] = deposit;
@@ -33,6 +53,10 @@ module.exports.loop = function () {
             }
 
         }
+        // Room Garbage Collector, clearing variables persist
         room.gc();
     }
+    // Game Garbage Collector, clearing variables persist
+    game.gc();
+    game.gcQueue();
 };
