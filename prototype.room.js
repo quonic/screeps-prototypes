@@ -18,93 +18,6 @@ var offsets = [
 module.exports = function () {
 
     /**
-     * Initialize the build queue
-     */
-    Room.prototype.initBuildQueue =
-        function () {
-            if (Memory.rooms === undefined) {
-                Memory.rooms = {};
-            }
-            if (Memory.rooms[this.name] === undefined) {
-                Memory.rooms[this.name] = {};
-            }
-            if (this.controller.my && Memory.rooms[this.name].buildQueue === undefined) {
-                this.clearBuildQueue();
-            }
-        };
-    /**
-     * Add a creep to the build queue
-     * @param name
-     * @param body
-     * @param memory
-     */
-    Room.prototype.addToBuildQueue =
-        function (name, body, memory) {
-            Memory.rooms[this.name].buildQueue.push({name: name, body: body, memory: memory});
-        };
-    /**
-     * Remove the first creep from the queue
-     */
-    Room.prototype.removeFromBuildQueue =
-        function () {
-            Memory.rooms[this.name].buildQueue.shift();
-        };
-    /**
-     * Clear the build queue
-     */
-    Room.prototype.clearBuildQueue =
-        function () {
-            Memory.rooms[this.name].buildQueue = {};
-        };
-    /**
-     * Get the creeps in the queue with a specific role
-     * @param role
-     * @returns {Array}
-     */
-    Room.prototype.getRolesInBuildQueue =
-        function (role) {
-            return _.filter(Memory.rooms[this.name].buildQueue,
-                function (creep) {
-                    return creep.memory.role == role;
-                }
-            );
-        };
-    /**
-     * Build the next creep(s) for this room
-     * @param spawn
-     * @constructor
-     */
-    Room.prototype.BuildNextCreep =
-        function (spawn) {
-            let spawns = this.getIdleSpawn();
-            if (spawns) {
-                for (let myspawn in spawns) {
-                    if (!spawns.hasOwnProperty(myspawn)) {
-                        continue;
-                    }
-                    let creep = this.getQueue();
-                    let created = myspawn.createCustomCreep(creep[0].name, creep[0].body, creep[0].memory);
-                    if (created === true) {
-                        this.removeFromBuildQueue();
-                    }
-                    else {
-                        myspawn.log("Failed to build creep: " + creep.name, ERR);
-                    }
-                }
-            } else {
-                // Failed to find any spawns
-                // For debugging
-            }
-        };
-    /**
-     * Get the build queue
-     * @returns {{}|*}
-     */
-    Room.prototype.getQueue =
-        function () {
-            return Memory.rooms[this.name].buildQueue;
-        };
-    /**
      * Returns the stored amount of energy in the room.
      * @returns {number|*}
      */
@@ -406,7 +319,6 @@ module.exports = function () {
         function () {
             this._storedEnergyInRoom = undefined;
             this._sources = undefined;
-            this._livingRoles = undefined;
             this._extensions = undefined;
             this._hostiles = undefined;
             this._hostile_structures = undefined;
