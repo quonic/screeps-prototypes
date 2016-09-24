@@ -3,6 +3,10 @@ var _livingRoles = {};
 
 module.exports.setup = function setup() {
     Object.assign(Game, {
+            /**
+             * Our list of friends for use in a filter
+             * @returns {{filter: filter}}
+             */
             friendlyFilter() {
                 return {
                     filter: function (c) {
@@ -15,70 +19,18 @@ module.exports.setup = function setup() {
                     }
                 };
             },
+            /**
+             * Start timer
+             */
             startTimer() {
                 timer = this.cpu.getUsed()
             },
             /**
-             *
+             * End timer and return the used cpu
              * @returns {number}
              */
             endTimer() {
                 return this.cpu.getUsed() - timer;
-            },
-            initBuildQueue()
-            {
-                if (Memory.GlobalQueue === undefined) {
-                    Memory.GlobalQueue = {};
-                }
-            },
-            addToBuildQueue(name, body, memory)
-            {
-                Memory.GlobalQueue.push({name: name, body: body, memory: memory});
-            },
-            removeFromBuildQueue()
-            {
-                Memory.GlobalQueue.shift();
-            },
-            clearBuildQueue()
-            {
-                Memory.GlobalQueue = {};
-            },
-            getRolesInBuildQueue(role)
-            {
-                return _.filter(Memory.GlobalQueue,
-                    function (creep) {
-                        return creep.memory.role == role;
-                    }
-                );
-            },
-            distributeQueue()
-            {
-                let creeps = Memory.GlobalQueue;
-
-                let myRooms = _.filter(Game.rooms,
-                    function (room) {
-                        return room.getQueue().length < 10;
-                    }
-                );
-                for (let room in myRooms) {
-                    if (!myRooms.hasOwnProperty(room)) {
-                        continue;
-                    }
-                    room.addToBuildQueue(creeps[0].name, creeps[0].body, creeps[0].memory);
-                    removeFromBuildQueue()
-                }
-            },
-            getLivingRoles(role){
-                let roleFilter = {
-                    filter: function (creep) {
-                        return creep.memory.role == role;
-                    }
-                };
-                if (_livingRoles) {
-                    return _.filter(_livingRoles, roleFilter);
-                }
-                _livingRoles = Game.creeps;
-                return _.filter(_livingRoles, roleFilter);
             },
             /**
              *
@@ -143,6 +95,12 @@ module.exports.setup = function setup() {
                     cost += BODYPART_COST[part]
                 }
                 return cost
+            },
+            /**
+             * Garbage Collector - Clears variables to prevent them from persisting to next tick
+             */
+            gc () {
+                // Placeholder for additional things to clean up
             }
         }
     )
