@@ -22,7 +22,7 @@ module.exports = function () {
         function () {
             return this.pos.findClosestByRange(FIND_MY_CREEPS, {
                 function(creep){
-                    return creep.id !== this.id;
+                    return creep.id !== super.id;
                 }
             });
         };
