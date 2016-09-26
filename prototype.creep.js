@@ -88,6 +88,7 @@ module.exports = function () {
     /**
      * Attack enemy structure, filtering out friendly structures.
      * @param target
+     * @returns {boolean}
      */
     Creep.prototype.attackEnemyStructure =
         function (target = null) {
@@ -97,7 +98,10 @@ module.exports = function () {
             } else {
                 this.attack(myTarget);
             }
-
+            if (myTarget) {
+                return true;
+            }
+            return false;
         };
     /**
      * Move creep to flag specified. Change as needed.
