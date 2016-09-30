@@ -12,16 +12,12 @@ global.NOTICE = 5;
 global.INFO = 6;
 global.DEBUG = 7;
 // Check if we failed to load utils.logger and don't try to run more than once
-if(FailedUtilsLogger) {
-    try {
-        require('utils.logger'); // From: https://github.com/Puciek/screeps-elk/blob/master/js/utils.logger.js
-        global.useUtilsLogger = true;
-        global.FailedUtilsLogger = false;
-    } catch (err) {
-        global.useUtilsLogger = false;
-        global.FailedUtilsLogger = true;
-        console.log("utils.logger.js: Not found.", ERR);
-    }
+try {
+    require('utils.logger'); // From: https://github.com/Puciek/screeps-elk/blob/master/js/utils.logger.js
+    global.useUtilsLogger = true;
+} catch (err) {
+    global.useUtilsLogger = false;
+    console.log("utils.logger.js: Not found.", ERR);
 }
 
 module.exports.loop = function () {
